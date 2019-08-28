@@ -16,22 +16,25 @@ const int ledBitmasks[] = {
   };
 
 unsigned long previousMillis = 0;
-unsigned long tikTime = 0;
-unsigned long tokTime = 0;
-unsigned long tickLength = 0;
+float tikTime = 0;
+float tokTime = 0;
+float tickLength = 0;
 unsigned long tikTimeStart = 0;
 unsigned long tokTimeStart = 0;
 
 unsigned long rightTimeStart = 0;
 unsigned long leftTimeStart = 0;
-unsigned long rightTime = 0;
-unsigned long leftTime = 0;
+float rightTime = 0;
+float leftTime = 0;
 
 bool tik = true;
 bool right = true;
 int column = 0;
-int columnLength = 0;
+float columnLength = 0;
 bool lastState = HIGH;
+
+float speedModifierRadius = .5;
+float speedModifierPivot = 1.5;
 
 void setup() {
   // set the outputs
@@ -42,12 +45,18 @@ void setup() {
   pinMode(inPin, INPUT);
 }
 
+float timeshift(float delta) {
+  float base = delta / tickLength;
+  float mod = 0.5 * cos(3.14 * base - 3.14) + 0.5;
+  return mod * tickLength;
+}
+
 void loop() {
   // Get state of sensor
   int state = digitalRead(inPin);
   unsigned long currentMillis = millis();
   // Update the clock and the "Left Right" state
-  if (lastState == HIGH && state == LOW){
+  if (lastState == LOW && state == HIGH){
     tik = !tik;
     if (tik) {
       tokTime = currentMillis - tokTimeStart;
@@ -57,7 +66,7 @@ void loop() {
       tokTimeStart = currentMillis;
     }
     // The right side takes longer, so if tik or tok is longer see if we're in that zone.
-    right = ((tikTime > tokTime) && right == tik) || ((tokTime > tikTime) && right != tik);
+    right = ((tikTime > tokTime) && tik) || ((tokTime > tikTime) && !tik);
     // Set relative variables
     rightTimeStart = (tik == right)? tikTimeStart : tokTimeStart;
     leftTimeStart = (tik == right)? tokTimeStart : tikTimeStart;
@@ -70,29 +79,29 @@ void loop() {
   }
   lastState = state;
   
-  unsigned long delta = 0;
-  // Calculate the position since last change
-  if (right) {
-    // Get the delta postion shifted by half the left time.
-    delta = currentMillis - (rightTimeStart - (leftTime / 2) );
-  } else {
-    // Or forward by right time
-    delta = currentMillis - (leftTimeStart + rightTime);
-  }
+  float delta = currentMillis - rightTimeStart;
 
-  // Check if forward or backward pass
-  if (delta <= tickLength || delta >= tickLength + (rightTime/2)) { // Forward pass
-    column = delta / columnLength;
-  } else { // Backward pass
-    column = columns - (delta - tickLength) / columnLength;
-  }
+  // Account for the passage of half of left by shifting the time a bit.
+  delta = delta + (leftTime/2);
   
+  // If delta is less than one tick length, then it's simple math
+  if (delta < tickLength) {
+    delta = delta;
+  } else if (delta > tickLength && delta < (tickLength * 2)){ // If delta is longer than a tick length, then we minus and go backwards till we reach more than 2 tickLenght
+    delta = (tickLength - (delta - tickLength));
+  } else if (delta > (tickLength * 2)){ // If delta is longer than two strokes then it's returning.
+    delta = (delta - (tickLength * 2));
+  }
+  // Shift time with a sin() function
+  delta = timeshift(delta);
+  
+  column = delta / columnLength;
   // Write that column to the LEDs
   for ( int i=pinLow; i < pinHigh; i++) {
     //byte output = ledBitmasks[i - pinLow] & image[column];
     int mask = ledBitmasks[i - pinLow];
     int output = mask & image[column];
-    digitalWrite(i, (output > 0));
+    digitalWrite(i, (output != 0));
     //digitalWrite(i, state);
   }
   
