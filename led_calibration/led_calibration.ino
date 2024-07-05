@@ -10,7 +10,7 @@ long nextBlinkUpdate = 0;
 
 void setup() {
   // set the outputs
-  for ( int i=pinLow; i < pinHigh; i++) {
+  for ( int i=0; i <= 7; i++) {
     pinMode(i, OUTPUT);
   }
 
