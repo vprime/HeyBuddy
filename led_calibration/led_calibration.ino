@@ -11,7 +11,7 @@ long nextBlinkUpdate = 0;
 void setup() {
   // set the outputs
   for ( int i=0; i <= 7; i++) {
-    pinMode(i, OUTPUT);
+    pinMode(ledPins[i], OUTPUT);
   }
 
   // Start with the first pin
@@ -46,9 +46,9 @@ void loop() {
   // Write updates to LED pins
   for ( int i=0; i <= 7; i++) {
     if (i == currentLed) {
-      digitalWrite(i, ledState);
+      digitalWrite(ledPins[i], ledState);
     } else {
-      digitalWrite(i, false);
+      digitalWrite(ledPins[i], false);
     }
   }
 }
