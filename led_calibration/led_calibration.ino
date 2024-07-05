@@ -3,7 +3,7 @@
 
 
 const long blinkSpeed = 1000;
-int ledPins[] = [4, 6, 9, 10, 8, 7, 5, 3];
+int ledPins[] = {4, 6, 9, 10, 8, 7, 5, 3};
 int currentLed = 0;
 int currentBlinkCount = 0;
 long nextBlinkUpdate = 0;
