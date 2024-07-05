@@ -11,3 +11,8 @@ Uses 8 pins in a row for LED output, mark the first pin and last pin.
 Uses 1 pin for light break sensor. It is assumed the postion of the light break sensor is to the left of center, the program may need to be adjusted if your model isn't.
 May god save you if the sensor is in the middle.
 
+# Hardware
+HD74LS244P 5M16
+Octal 3 state buffer
+https://learn.adafruit.com/digital-circuits-6-eprom-emulator/the-74244-octal-tristate-buffer
+

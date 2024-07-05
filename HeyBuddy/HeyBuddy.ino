@@ -97,7 +97,7 @@ void loop() {
   
   column = delta / columnLength;
   // Write that column to the LEDs
-  for ( int i=pinLow; i < pinHigh; i++) {
+  for ( int i=pinLow; i <= pinHigh; i++) {
     //byte output = ledBitmasks[i - pinLow] & image[column];
     int mask = ledBitmasks[i - pinLow];
     int output = mask & image[column];
