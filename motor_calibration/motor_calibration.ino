@@ -5,8 +5,8 @@ int motorSensorPin = 11;
 int ledMotor = 4;
 int ledSensor = 3;
 
-long motorPulseLength = 60;
-long motorPulseDelay = 120;
+long motorPulseLength = 58;
+long motorPulseDelay = 117;
 long pulseStart = 0;
 
 
